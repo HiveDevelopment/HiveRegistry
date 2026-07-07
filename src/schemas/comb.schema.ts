@@ -19,7 +19,7 @@ export const CombSchema = z.object({
     working_dir: z.string(),
     entrypoint: z.array(z.string()),
 
-    environment: z.record(z.string()),
+    environment: z.record(z.string(), z.string()),
 
     mounts: z.array(
         z.object({

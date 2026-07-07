@@ -24,7 +24,9 @@ export class PaperProvider implements JarProvider {
         }
 
         const versionGroups = data.versions;
-        const allVersions = Object.values(versionGroups).flat();
+        const allVersions = Object.values(versionGroups)
+            .flat()
+            .filter((version): version is string => typeof version === "string");
 
         const results: ResolvedJar[] = [];
 

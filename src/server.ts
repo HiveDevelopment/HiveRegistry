@@ -1,14 +1,17 @@
 import { buildApp } from "./app.js";
+import { config } from "./config.js";
 
 async function start() {
     const app = await buildApp();
 
     await app.listen({
-        host: "0.0.0.0",
-        port: 8080,
+        host: config.server.host,
+        port: config.server.port,
     });
 
-    console.log("HiveRegistry listening on http://localhost:8080");
+    console.log(
+        `${config.app.name} listening on ${config.app.url}`
+    );
 }
 
 start().catch((err) => {

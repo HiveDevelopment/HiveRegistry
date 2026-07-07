@@ -1,0 +1,19 @@
+{
+  "id": "paper",
+  "name": "PaperMC",
+  "game": "minecraft",
+  "type": "paper",
+
+  "versions": [
+    {
+      "version": "1.21.11",
+      "build": 150,
+      "url": "https://api.papermc.io/v2/projects/paper/versions/1.21.11/builds/150/downloads/paper-1.21.11-150.jar"
+    },
+    {
+      "version": "1.21.10",
+      "build": 140,
+      "url": "https://api.papermc.io/v2/projects/paper/versions/1.21.10/builds/140/downloads/paper-1.21.10-140.jar"
+    }
+  ]
+}

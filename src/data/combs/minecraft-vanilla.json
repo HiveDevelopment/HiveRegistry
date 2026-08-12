@@ -1,0 +1,70 @@
+{
+    "id": "minecraft-vanilla",
+    "name": "Minecraft Vanilla",
+    "game": "minecraft",
+    "tags": ["minecraft", "vanilla", "server"],
+    "image": "ghcr.io/hiveossoftware/hivepanel-java:25",
+    "working_dir": "/home/container",
+    "entrypoint": [],
+    "environment": {
+        "TZ": "UTC"
+    },
+    "mounts": [
+        {
+            "source": "instance",
+            "target": "/home/container"
+        }
+    ],
+    "startup": "java -Xms{{memory}}M -Xmx{{memory}}M -jar server.jar nogui",
+    "variables_schema": [
+        {
+            "name": "memory",
+            "type": "number",
+            "default": 1024,
+            "required": true
+        },
+        {
+            "name": "version",
+            "type": "string",
+            "default": "26.2",
+            "required": true
+        }
+    ],
+    "install": [
+        {
+            "type": "http",
+            "with": {
+                "url": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+            },
+            "save": "version_manifest"
+        },
+        {
+            "type": "http",
+            "with": {
+                "url": "{{version_manifest.versions[?id=='{{version}}'].url}}"
+            },
+            "save": "version_metadata"
+        },
+        {
+            "type": "download",
+            "with": {
+                "url": "{{version_metadata.downloads.server.url}}",
+                "target": "server.jar"
+            }
+        },
+        {
+            "type": "write_file",
+            "with": {
+                "target": "eula.txt",
+                "content": "eula=true\n"
+            }
+        },
+        {
+            "type": "write_file",
+            "with": {
+                "target": "server.properties",
+                "content": "server-port={{allocation.port}}\nonline-mode=true\nmotd=HivePanel Server\n"
+            }
+        }
+    ]
+}

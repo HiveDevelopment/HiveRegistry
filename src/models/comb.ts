@@ -35,7 +35,19 @@ export interface CombMount {
 }
 
 export interface CombInstallOperation {
-    type: "http" | "download" | "write_file" | "mkdir" | "chmod" | "move" | "copy" | "delete" | "extract" | "steamcmd" | "git";
+    type:
+        | "http"
+        | "download"
+        | "write_file"
+        | "mkdir"
+        | "chmod"
+        | "move"
+        | "copy"
+        | "delete"
+        | "extract"
+        | "steamcmd"
+        | "git"
+        | "run";
     with: Record<string, unknown>;
     save?: string;
 }

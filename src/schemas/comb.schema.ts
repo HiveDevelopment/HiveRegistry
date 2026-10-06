@@ -46,7 +46,8 @@ export const CombInstallOperationZod = z.discriminatedUnion("type", [
     z.object({ type: z.literal("delete"), with: InstallWithZod, save: z.string().optional() }),
     z.object({ type: z.literal("extract"), with: InstallWithZod, save: z.string().optional() }),
     z.object({ type: z.literal("steamcmd"), with: InstallWithZod, save: z.string().optional() }),
-    z.object({ type: z.literal("git"), with: InstallWithZod, save: z.string().optional() })
+    z.object({ type: z.literal("git"), with: InstallWithZod, save: z.string().optional() }),
+    z.object({ type: z.literal("run"), with: InstallWithZod, save: z.string().optional() })
 ]);
 
 export const CombSchema = z.object({

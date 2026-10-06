@@ -9,12 +9,16 @@ const COMBS_DIR = path.join(process.cwd(), "src/data/combs");
 export class CombService {
     async list(filters?: {
         search?: string;
+        category?: string;
+        group?: string;
         game?: string;
         tags?: string | string[];
     }): Promise<Comb[]> {
         const combs: Comb[] = [];
+
         async function scanDir(dir: string) {
             const entries = await fs.readdir(dir, { withFileTypes: true });
+
             for (const entry of entries) {
                 const fullPath = path.join(dir, entry.name);
 
@@ -23,12 +27,13 @@ export class CombService {
                     continue;
                 }
 
-                if (!entry.name.endsWith(".json")) continue;
+                if (!entry.name.endsWith(".json")) {
+                    continue;
+                }
 
                 try {
                     const json = await fs.readFile(fullPath, "utf8");
                     const raw = JSON.parse(json);
-
                     const result = CombSchema.safeParse(raw);
 
                     if (!result.success) {
@@ -40,7 +45,6 @@ export class CombService {
                     }
 
                     combs.push(result.data);
-
                 } catch (err) {
                     console.error(
                         `[HiveRegistry] Failed to load comb file: ${fullPath}`,
@@ -51,72 +55,72 @@ export class CombService {
         }
 
         await scanDir(COMBS_DIR);
-        return this.applyFilters(combs, filters);
+
+        return this.applyFilters(combs, filters)
+            .sort((a, b) =>
+                a.category.localeCompare(b.category) ||
+                a.group.localeCompare(b.group) ||
+                a.name.localeCompare(b.name)
+            );
     }
 
     async get(id: string): Promise<Comb | null> {
-        async function scanDir(dir: string): Promise<Comb | null> {
-            const entries = await fs.readdir(dir, { withFileTypes: true });
-            for (const entry of entries) {
-                const fullPath = path.join(dir, entry.name);
-                if (entry.isDirectory()) {
-                    const found = await scanDir(fullPath);
-                    if (found) return found;
-                    continue;
-                }
+        const combs = await this.list();
 
-                if (!entry.name.endsWith(".json")) continue;
-                try {
-                    const json = await fs.readFile(fullPath, "utf8");
-                    const raw = JSON.parse(json);
-
-                    const result = CombSchema.safeParse(raw);
-
-                    if (!result.success) {
-                        continue;
-                    }
-
-                    if (result.data.id === id) {
-                        return result.data;
-                    }
-
-                } catch {
-                    continue;
-                }
-            }
-            return null;
-        }
-        return scanDir(COMBS_DIR);
+        return combs.find(comb => comb.id === id) ?? null;
     }
 
     private applyFilters(
         combs: Comb[],
-        filters?: { search?: string; game?: string; tags?: string | string[] }
+        filters?: {
+            search?: string;
+            category?: string;
+            group?: string;
+            game?: string;
+            tags?: string | string[];
+        }
     ): Comb[] {
-        if (!filters) return combs;
-        let result = combs;
-
-        if (filters.game) {
-            result = result.filter(c => c.game === filters.game);
+        if (!filters) {
+            return combs;
         }
 
-         if (filters.tags) {
-            const tags = Array.isArray(filters.tags)
-                ? filters.tags
-                : filters.tags.split(",");
+        let result = combs;
 
-            result = result.filter(c =>
-                tags.every(tag => c.tags.includes(tag))
+        if (filters.category) {
+            result = result.filter(comb => comb.category === filters.category);
+        }
+
+        if (filters.group) {
+            result = result.filter(comb => comb.group === filters.group);
+        }
+
+        if (filters.game) {
+            result = result.filter(comb => comb.game === filters.game || comb.group === filters.game);
+        }
+
+        if (filters.tags) {
+            const tags = (Array.isArray(filters.tags) ? filters.tags : filters.tags.split(","))
+                .map(tag => tag.trim().toLowerCase())
+                .filter(Boolean);
+
+            result = result.filter(comb =>
+                tags.every(tag => comb.tags.some(combTag => combTag.toLowerCase() === tag))
             );
         }
 
         if (filters.search) {
-            const s = filters.search.toLowerCase();
-            result = result.filter(c =>
-                c.id.toLowerCase().includes(s) ||
-                c.name.toLowerCase().includes(s)
+            const search = filters.search.toLowerCase().trim();
+
+            result = result.filter(comb =>
+                comb.id.toLowerCase().includes(search) ||
+                comb.name.toLowerCase().includes(search) ||
+                comb.category.toLowerCase().includes(search) ||
+                comb.group.toLowerCase().includes(search) ||
+                (comb.game ?? "").toLowerCase().includes(search) ||
+                comb.tags.some(tag => tag.toLowerCase().includes(search))
             );
         }
+
         return result;
     }
 }

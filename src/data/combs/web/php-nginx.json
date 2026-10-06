@@ -1,0 +1,50 @@
+{
+  "id": "web-php-nginx",
+  "name": "PHP Website (Nginx)",
+  "category": "web",
+  "group": "php",
+  "tags": [
+    "web",
+    "php",
+    "nginx"
+  ],
+  "capabilities": [
+    "console",
+    "files",
+    "logs",
+    "environment",
+    "domains",
+    "ssl",
+    "backups"
+  ],
+  "image": "php:8.4-fpm-alpine",
+  "working_dir": "/home/container",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/home/container"
+    }
+  ],
+  "startup": "php -S 0.0.0.0:{{allocation.port}} -t {{document_root}}",
+  "variables_schema": [
+    {
+      "name": "document_root",
+      "type": "string",
+      "default": ".",
+      "required": true
+    }
+  ],
+  "install": [
+    {
+      "type": "write_file",
+      "with": {
+        "target": "index.php",
+        "content": "<?php echo '<h1>HivePanel</h1><p>Your PHP website is ready.</p>';"
+      }
+    }
+  ]
+}

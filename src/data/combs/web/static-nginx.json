@@ -1,0 +1,41 @@
+{
+  "id": "web-static-nginx",
+  "name": "Static Website (Nginx)",
+  "category": "web",
+  "group": "static",
+  "tags": [
+    "web",
+    "static",
+    "nginx"
+  ],
+  "capabilities": [
+    "files",
+    "logs",
+    "domains",
+    "ssl",
+    "backups"
+  ],
+  "image": "nginx:alpine",
+  "working_dir": "/usr/share/nginx/html",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/usr/share/nginx/html"
+    }
+  ],
+  "startup": "nginx -g 'daemon off;'",
+  "variables_schema": [],
+  "install": [
+    {
+      "type": "write_file",
+      "with": {
+        "target": "index.html",
+        "content": "<!doctype html><html><body><h1>HivePanel</h1><p>Your website is ready.</p></body></html>"
+      }
+    }
+  ]
+}

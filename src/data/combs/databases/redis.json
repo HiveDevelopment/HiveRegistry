@@ -1,0 +1,40 @@
+{
+  "id": "database-redis",
+  "name": "Redis",
+  "category": "database",
+  "group": "redis",
+  "tags": [
+    "database",
+    "cache",
+    "redis"
+  ],
+  "capabilities": [
+    "console",
+    "logs",
+    "environment",
+    "backups",
+    "credentials",
+    "database"
+  ],
+  "image": "redis:8-alpine",
+  "working_dir": "/data",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/data"
+    }
+  ],
+  "startup": "redis-server --appendonly yes --requirepass {{password}}",
+  "variables_schema": [
+    {
+      "name": "password",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "install": []
+}

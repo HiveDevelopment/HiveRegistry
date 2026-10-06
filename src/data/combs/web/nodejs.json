@@ -1,0 +1,44 @@
+{
+  "id": "web-nodejs",
+  "name": "Node.js Website",
+  "category": "web",
+  "group": "nodejs",
+  "tags": [
+    "web",
+    "nodejs",
+    "javascript"
+  ],
+  "capabilities": [
+    "console",
+    "files",
+    "logs",
+    "environment",
+    "domains",
+    "ssl",
+    "backups"
+  ],
+  "image": "node:22-alpine",
+  "working_dir": "/home/container",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC",
+    "NODE_ENV": "production"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/home/container"
+    }
+  ],
+  "startup": "{{startup_command}}",
+  "variables_schema": [
+    {
+      "name": "startup_command",
+      "type": "string",
+      "default": "npm start",
+      "required": true,
+      "description": "Command used to start the application."
+    }
+  ],
+  "install": []
+}

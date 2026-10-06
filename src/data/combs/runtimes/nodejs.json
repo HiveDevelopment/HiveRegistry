@@ -1,0 +1,44 @@
+{
+  "id": "runtime-nodejs",
+  "name": "Node.js",
+  "category": "runtime",
+  "group": "nodejs",
+  "tags": [
+    "runtime",
+    "nodejs",
+    "javascript"
+  ],
+  "capabilities": [
+    "console",
+    "files",
+    "logs",
+    "environment",
+    "allocations",
+    "sftp",
+    "backups",
+    "schedules"
+  ],
+  "image": "node:22-alpine",
+  "working_dir": "/home/container",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC",
+    "NODE_ENV": "production"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/home/container"
+    }
+  ],
+  "startup": "{{startup_command}}",
+  "variables_schema": [
+    {
+      "name": "startup_command",
+      "type": "string",
+      "default": "node index.js",
+      "required": true
+    }
+  ],
+  "install": []
+}

@@ -1,0 +1,85 @@
+{
+  "id": "minecraft-forge",
+  "name": "Minecraft Forge",
+  "category": "game",
+  "group": "minecraft",
+  "game": "minecraft",
+  "tags": [
+    "minecraft",
+    "forge",
+    "modded",
+    "server"
+  ],
+  "capabilities": [
+    "console",
+    "files",
+    "logs",
+    "environment",
+    "allocations",
+    "sftp",
+    "backups",
+    "schedules"
+  ],
+  "image": "ghcr.io/hiveossoftware/hivepanel-java:25",
+  "working_dir": "/home/container",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/home/container"
+    }
+  ],
+  "startup": "java -Xms{{memory}}M -Xmx{{memory}}M @libraries/net/minecraftforge/forge/{{version}}-{{forge_version}}/unix_args.txt nogui",
+  "variables_schema": [
+    {
+      "name": "memory",
+      "type": "number",
+      "default": 4096,
+      "required": true
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "default": "1.21.11",
+      "required": true
+    },
+    {
+      "name": "forge_version",
+      "type": "string",
+      "default": "61.1.14",
+      "required": true
+    }
+  ],
+  "install": [
+    {
+      "type": "download",
+      "with": {
+        "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/{{version}}-{{forge_version}}/forge-{{version}}-{{forge_version}}-installer.jar",
+        "target": "forge-installer.jar"
+      }
+    },
+    {
+      "type": "command",
+      "with": {
+        "command": "java -jar forge-installer.jar --installServer"
+      }
+    },
+    {
+      "type": "write_file",
+      "with": {
+        "target": "eula.txt",
+        "content": "eula=true\n"
+      }
+    },
+    {
+      "type": "write_file",
+      "with": {
+        "target": "server.properties",
+        "content": "server-port={{allocation.port}}\nonline-mode=true\nmotd=HivePanel Forge Server\n"
+      }
+    }
+  ]
+}

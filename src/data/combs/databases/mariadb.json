@@ -1,0 +1,62 @@
+{
+  "id": "database-mariadb",
+  "name": "MariaDB",
+  "category": "database",
+  "group": "mariadb",
+  "tags": [
+    "database",
+    "sql",
+    "mariadb",
+    "mysql"
+  ],
+  "capabilities": [
+    "console",
+    "logs",
+    "environment",
+    "backups",
+    "credentials",
+    "database"
+  ],
+  "image": "mariadb:11.8",
+  "working_dir": "/var/lib/mysql",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC",
+    "MARIADB_DATABASE": "{{database_name}}",
+    "MARIADB_USER": "{{database_user}}",
+    "MARIADB_PASSWORD": "{{database_password}}",
+    "MARIADB_ROOT_PASSWORD": "{{root_password}}"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/var/lib/mysql"
+    }
+  ],
+  "startup": "",
+  "variables_schema": [
+    {
+      "name": "database_name",
+      "type": "string",
+      "default": "hivepanel",
+      "required": true
+    },
+    {
+      "name": "database_user",
+      "type": "string",
+      "default": "hivepanel",
+      "required": true
+    },
+    {
+      "name": "database_password",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "root_password",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "install": []
+}

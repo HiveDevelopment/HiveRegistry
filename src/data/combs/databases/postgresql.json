@@ -1,0 +1,56 @@
+{
+  "id": "database-postgresql",
+  "name": "PostgreSQL",
+  "category": "database",
+  "group": "postgresql",
+  "tags": [
+    "database",
+    "sql",
+    "postgresql",
+    "postgres"
+  ],
+  "capabilities": [
+    "console",
+    "logs",
+    "environment",
+    "backups",
+    "credentials",
+    "database"
+  ],
+  "image": "postgres:18-alpine",
+  "working_dir": "/var/lib/postgresql/data",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC",
+    "POSTGRES_DB": "{{database_name}}",
+    "POSTGRES_USER": "{{database_user}}",
+    "POSTGRES_PASSWORD": "{{database_password}}"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/var/lib/postgresql/data"
+    }
+  ],
+  "startup": "",
+  "variables_schema": [
+    {
+      "name": "database_name",
+      "type": "string",
+      "default": "hivepanel",
+      "required": true
+    },
+    {
+      "name": "database_user",
+      "type": "string",
+      "default": "hivepanel",
+      "required": true
+    },
+    {
+      "name": "database_password",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "install": []
+}

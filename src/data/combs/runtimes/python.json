@@ -1,0 +1,43 @@
+{
+  "id": "runtime-python",
+  "name": "Python",
+  "category": "runtime",
+  "group": "python",
+  "tags": [
+    "runtime",
+    "python"
+  ],
+  "capabilities": [
+    "console",
+    "files",
+    "logs",
+    "environment",
+    "allocations",
+    "sftp",
+    "backups",
+    "schedules"
+  ],
+  "image": "python:3.14-alpine",
+  "working_dir": "/home/container",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "mounts": [
+    {
+      "source": "instance",
+      "target": "/home/container"
+    }
+  ],
+  "startup": "{{startup_command}}",
+  "variables_schema": [
+    {
+      "name": "startup_command",
+      "type": "string",
+      "default": "python main.py",
+      "required": true
+    }
+  ],
+  "install": []
+}

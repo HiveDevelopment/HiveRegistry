@@ -1,0 +1,122 @@
+{
+    "id": "steam-rust",
+    "name": "Rust",
+    "category": "game",
+    "group": "steam",
+    "game": "rust",
+    "tags": [
+        "rust",
+        "steam",
+        "steamcmd",
+        "survival",
+        "facepunch"
+    ],
+    "capabilities": [
+        "console",
+        "files",
+        "logs",
+        "environment",
+        "allocations",
+        "sftp",
+        "backups",
+        "schedules"
+    ],
+    "image": "ghcr.io/hiveossoftware/hivepanel-steamcmd:latest",
+    "working_dir": "/home/container",
+    "entrypoint": [],
+    "environment": {
+        "TZ": "UTC"
+    },
+    "mounts": [],
+    "startup": "./RustDedicated -batchmode +server.port {{server_port}} +server.queryport {{query_port}} +server.identity \"{{server_identity}}\" +server.hostname \"{{server_name}}\" +server.description \"{{server_description}}\" +server.level \"Procedural Map\" +server.seed {{server_seed}} +server.worldsize {{world_size}} +server.maxplayers {{max_players}} +rcon.port {{rcon_port}} +rcon.password \"{{rcon_password}}\" +rcon.web 1 -logfile -",
+    "variables_schema": [
+        {
+            "name": "server_port",
+            "type": "number",
+            "default": 28015,
+            "required": true,
+            "description": "Primary UDP game port."
+        },
+        {
+            "name": "query_port",
+            "type": "number",
+            "default": 28016,
+            "required": true,
+            "description": "Steam server query port. Must be different from the game port."
+        },
+        {
+            "name": "rcon_port",
+            "type": "number",
+            "default": 28017,
+            "required": true,
+            "description": "TCP port used for Rust WebRCON."
+        },
+        {
+            "name": "rcon_password",
+            "type": "string",
+            "default": "CHANGE_ME",
+            "required": true,
+            "description": "Password used to authenticate with RCON."
+        },
+        {
+            "name": "server_identity",
+            "type": "string",
+            "default": "hivepanel",
+            "required": true,
+            "description": "Internal Rust server identity."
+        },
+        {
+            "name": "server_name",
+            "type": "string",
+            "default": "A HivePanel Rust Server",
+            "required": true,
+            "description": "Server name displayed in Rust."
+        },
+        {
+            "name": "server_description",
+            "type": "string",
+            "default": "Powered by HivePanel",
+            "required": false,
+            "description": "Description displayed for the server."
+        },
+        {
+            "name": "server_seed",
+            "type": "number",
+            "default": 12345,
+            "required": true,
+            "description": "Procedural map seed."
+        },
+        {
+            "name": "world_size",
+            "type": "number",
+            "default": 3500,
+            "required": true,
+            "description": "Procedural map size."
+        },
+        {
+            "name": "max_players",
+            "type": "number",
+            "default": 100,
+            "required": true,
+            "description": "Maximum number of concurrent players."
+        }
+    ],
+    "install": [
+        {
+            "type": "steamcmd",
+            "with": {
+                "app_id": 258550,
+                "login": "anonymous",
+                "install_dir": "/home/container",
+                "validate": true
+            }
+        },
+        {
+            "type": "chmod",
+            "with": {
+                "path": "/home/container/RustDedicated",
+                "mode": "0755"
+            }
+        }
+    ]
+}

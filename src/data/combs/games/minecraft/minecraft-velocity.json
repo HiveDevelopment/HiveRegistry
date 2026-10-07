@@ -19,7 +19,7 @@
     "backups",
     "schedules"
   ],
-  "image": "ghcr.io/hiveossoftware/hivepanel-java:25",
+  "image": "ghcr.io/hivedevelopment/hivepanel-java:25",
   "working_dir": "/home/container",
   "entrypoint": [],
   "environment": {

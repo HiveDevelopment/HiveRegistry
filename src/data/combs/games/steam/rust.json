@@ -21,7 +21,7 @@
         "backups",
         "schedules"
     ],
-    "image": "ghcr.io/hiveossoftware/hivepanel-steamcmd:latest",
+    "image": "ghcr.io/hivedevelopment/hivepanel-steamcmd:latest",
     "working_dir": "/home/container",
     "entrypoint": [],
     "environment": {
@@ -114,7 +114,7 @@
         {
             "type": "chmod",
             "with": {
-                "path": "/home/container/RustDedicated",
+                "target": "RustDedicated",
                 "mode": "0755"
             }
         }

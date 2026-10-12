@@ -1,0 +1,121 @@
+{
+  "id": "project-zomboid",
+  "name": "Project Zomboid",
+  "category": "game",
+  "group": "steam",
+  "game": "project-zomboid",
+  "tags": [
+    "project-zomboid",
+    "zomboid",
+    "steam",
+    "steamcmd",
+    "survival",
+    "multiplayer"
+  ],
+  "capabilities": [
+    "console",
+    "files",
+    "logs",
+    "environment",
+    "allocations",
+    "sftp",
+    "backups",
+    "schedules"
+  ],
+  "image": "ghcr.io/hivedevelopment/hivepanel-steamcmd:latest",
+  "working_dir": "/home/container",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC",
+    "HOME": "/home/container"
+  },
+  "mounts": [],
+  "startup": "bash -c 'set -e; cd /home/container; HEAP={{memory}}; sed -i -E \"s/-Xmx[0-9]+[mMgG]/-Xmx${HEAP}m/g; s/-Xms[0-9]+[mMgG]/-Xms512m/g\" ProjectZomboid64.json; echo \"Java heap: ${HEAP} MB\"; export PATH=\"/home/container/jre64/bin:$PATH\"; export LD_LIBRARY_PATH=\"/home/container/linux64:/home/container/natives:${LD_LIBRARY_PATH:-}\"; exec ./ProjectZomboid64 -cachedir=/home/container/Zomboid -servername \"{{server_name}}\" -port {{allocation.port}} -adminusername \"{{admin_user}}\" -adminpassword \"{{admin_password}}\"'",
+  "variables_schema": [
+    {
+      "name": "server_name",
+      "type": "string",
+      "default": "servertest",
+      "required": true,
+      "description": "Internal name for saves and configuration. Use letters and numbers without spaces."
+    },
+    {
+      "name": "admin_user",
+      "type": "string",
+      "default": "admin",
+      "required": true,
+      "description": "Project Zomboid initial administrator username."
+    },
+    {
+      "name": "admin_password",
+      "type": "string",
+      "default": "CHANGE_ME",
+      "required": true,
+      "description": "Initial administrator password. Replace with a strong password."
+    }
+  ],
+  "install": [
+    {
+      "type": "steamcmd",
+      "with": {
+        "app_id": 380870,
+        "login": "anonymous",
+        "install_dir": "/home/container",
+        "validate": true
+      }
+    },
+    {
+      "type": "chmod",
+      "with": {
+        "target": "ProjectZomboid64",
+        "mode": "0755"
+      }
+    }
+  ],
+  "console_commands": [
+    "additem",
+    "addvehicle",
+    "addxp",
+    "alarm",
+    "changeoption",
+    "chopper",
+    "changepwd",
+    "createhorde",
+    "godmode",
+    "gunshot",
+    "help",
+    "invisible",
+    "noclip",
+    "quit",
+    "releasesafehouse",
+    "reloadoptions",
+    "replay",
+    "save",
+    "sendpulse",
+    "showoptions",
+    "startrain",
+    "stoprain",
+    "teleport",
+    "teleportto",
+    "addalltowhitelist",
+    "adduser",
+    "addusertowhitelist",
+    "removeuserfromwhitelist",
+    "banid",
+    "unbanid",
+    "banuser",
+    "unbanuser",
+    "grandadmin",
+    "removeadmin",
+    "kickuser",
+    "players",
+    "servermsg",
+    "setaccesslevel",
+    "voiceban"
+  ],
+  "stop": {
+    "command": "quit",
+    "timeout": 30,
+    "signal": "SIGTERM"
+  }
+}

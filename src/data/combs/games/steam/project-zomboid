@@ -30,7 +30,7 @@
     "HOME": "/home/container"
   },
   "mounts": [],
-  "startup": "bash -c 'set -e; cd /home/container; HEAP={{memory}}; sed -i -E \"s/-Xmx[0-9]+[mMgG]/-Xmx${HEAP}m/g; s/-Xms[0-9]+[mMgG]/-Xms512m/g\" ProjectZomboid64.json; echo \"Java heap: ${HEAP} MB\"; export PATH=\"/home/container/jre64/bin:$PATH\"; export LD_LIBRARY_PATH=\"/home/container/linux64:/home/container/natives:${LD_LIBRARY_PATH:-}\"; exec ./ProjectZomboid64 -cachedir=/home/container/Zomboid -servername \"{{server_name}}\" -port {{allocation.port}} -adminusername \"{{admin_user}}\" -adminpassword \"{{admin_password}}\"'",
+  "startup": "bash -c 'HEAP=$(({{memory}} * 75 / 100)); echo \"Java heap: ${HEAP}MB / {{memory}}MB\"; sed -i -E \"s/-Xmx[0-9]+[mMgG]/-Xmx${HEAP}m/g\" /home/container/ProjectZomboid64.json || exit 1; exec bash ./start-server.sh -port {{allocation.port}} -udpport {{steam_port}} -cachedir=/home/container/Zomboid -servername \"{{server_name}}\" -adminusername \"{{admin_user}}\" -adminpassword \"{{admin_password}}\"'",
   "variables_schema": [
     {
       "name": "server_name",
@@ -52,6 +52,13 @@
       "default": "CHANGE_ME",
       "required": true,
       "description": "Initial administrator password. Replace with a strong password."
+    },
+    {
+      "name": "steam_port",
+      "type": "number",
+      "default": 16262,
+      "required": true,
+      "description": "Secondary Project Zomboid UDP port. Allocate and publish this port as UDP in HivePanel."
     }
   ],
   "install": [

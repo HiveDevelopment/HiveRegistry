@@ -1,0 +1,128 @@
+{
+  "id": "project-zomboid",
+  "name": "Project Zomboid",
+  "category": "game",
+  "group": "steam",
+  "game": "project-zomboid",
+  "tags": [
+    "project-zomboid",
+    "zomboid",
+    "steam",
+    "steamcmd",
+    "survival",
+    "multiplayer"
+  ],
+  "capabilities": [
+    "console",
+    "files",
+    "logs",
+    "environment",
+    "allocations",
+    "sftp",
+    "backups",
+    "schedules"
+  ],
+  "image": "ghcr.io/hivedevelopment/hivepanel-steamcmd:latest",
+  "working_dir": "/home/container",
+  "entrypoint": [],
+  "environment": {
+    "TZ": "UTC",
+    "HOME": "/home/container"
+  },
+  "mounts": [],
+  "startup": "bash -c 'HEAP=$(({{memory}} * 75 / 100)); echo \"Java heap: ${HEAP}MB / {{memory}}MB\"; sed -i -E \"s/-Xmx[0-9]+[mMgG]/-Xmx${HEAP}m/g\" /home/container/ProjectZomboid64.json || exit 1; exec bash ./start-server.sh -port {{allocation.port}} -udpport {{steam_port}} -cachedir=/home/container/Zomboid -servername \"{{server_name}}\" -adminusername \"{{admin_user}}\" -adminpassword \"{{admin_password}}\"'",
+  "variables_schema": [
+    {
+      "name": "server_name",
+      "type": "string",
+      "default": "servertest",
+      "required": true,
+      "description": "Internal name for saves and configuration. Use letters and numbers without spaces."
+    },
+    {
+      "name": "admin_user",
+      "type": "string",
+      "default": "admin",
+      "required": true,
+      "description": "Project Zomboid initial administrator username."
+    },
+    {
+      "name": "admin_password",
+      "type": "string",
+      "default": "CHANGE_ME",
+      "required": true,
+      "description": "Initial administrator password. Replace with a strong password."
+    },
+    {
+      "name": "steam_port",
+      "type": "number",
+      "default": 16262,
+      "required": true,
+      "description": "Secondary Project Zomboid UDP port. Allocate and publish this port as UDP in HivePanel."
+    }
+  ],
+  "install": [
+    {
+      "type": "steamcmd",
+      "with": {
+        "app_id": 380870,
+        "login": "anonymous",
+        "install_dir": "/home/container",
+        "validate": true
+      }
+    },
+    {
+      "type": "chmod",
+      "with": {
+        "target": "ProjectZomboid64",
+        "mode": "0755"
+      }
+    }
+  ],
+  "console_commands": [
+    "additem",
+    "addvehicle",
+    "addxp",
+    "alarm",
+    "changeoption",
+    "chopper",
+    "changepwd",
+    "createhorde",
+    "godmode",
+    "gunshot",
+    "help",
+    "invisible",
+    "noclip",
+    "quit",
+    "releasesafehouse",
+    "reloadoptions",
+    "replay",
+    "save",
+    "sendpulse",
+    "showoptions",
+    "startrain",
+    "stoprain",
+    "teleport",
+    "teleportto",
+    "addalltowhitelist",
+    "adduser",
+    "addusertowhitelist",
+    "removeuserfromwhitelist",
+    "banid",
+    "unbanid",
+    "banuser",
+    "unbanuser",
+    "grandadmin",
+    "removeadmin",
+    "kickuser",
+    "players",
+    "servermsg",
+    "setaccesslevel",
+    "voiceban"
+  ],
+  "stop": {
+    "command": "quit",
+    "timeout": 30,
+    "signal": "SIGTERM"
+  }
+}

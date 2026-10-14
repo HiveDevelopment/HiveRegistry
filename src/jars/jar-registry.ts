@@ -1,29 +1,25 @@
 import type { JarProvider, ResolvedJar } from "./providers/jar-provider.js";
 
 export class JarRegistry {
+  constructor(private providers: JarProvider[]) {}
 
-    constructor(private providers: JarProvider[]) {}
+  async get(type: string, version?: string): Promise<ResolvedJar | null> {
+    for (const provider of this.providers) {
+      const result = await provider.get(type, version);
 
-    async get(type: string, version?: string): Promise<ResolvedJar | null> {
-
-        for (const provider of this.providers) {
-
-            const result = await provider.get(type, version);
-
-            if (result) return result;
-        }
-
-        return null;
+      if (result) return result;
     }
 
-    async list(): Promise<ResolvedJar[]> {
+    return null;
+  }
 
-        const all: ResolvedJar[] = [];
+  async list(): Promise<ResolvedJar[]> {
+    const all: ResolvedJar[] = [];
 
-        for (const provider of this.providers) {
-            all.push(...await provider.list());
-        }
-
-        return all;
+    for (const provider of this.providers) {
+      all.push(...(await provider.list()));
     }
+
+    return all;
+  }
 }

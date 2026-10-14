@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
   },
   "keywords": [],
   "author": "",
@@ -21,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.1.0",
+    "prettier": "^3.9.10",
     "tsx": "^4.23.0",
     "typescript": "^6.0.3"
   }

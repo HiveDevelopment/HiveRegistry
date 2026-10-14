@@ -416,3 +416,18 @@ minecraft:
 For a private Registry, replace the URLs in both configurations with the same reachable HTTPS Registry origin. Workers need no Modrinth or CurseForge keys. If Worker configuration omits `minecraft.registry_url`, it defaults to `https://registry.hivepanel.dev`.
 
 Deploy compatible Registry, Worker and Panel releases together. Native Minecraft installers support Minecraft Java with Vanilla, Paper, Fabric, Forge and NeoForge. Bedrock, Quilt installation, Spigot BuildTools and arbitrary installer scripts are not included in this implementation. Some published packs require authors' dedicated server distributions and cannot be installed from these manifests automatically.
+
+
+## Application preinstalls
+
+Administrator-maintained JSON recipes under `src/data/preinstalls/` (or `PREINSTALL_CATALOGUE_DIR`) provide versioned prebuilt application images, startup/environment templates and initial Cell files. The first recipe is Discord Tickets. Combs offer recipe IDs through `"preinstalls": ["discord-tickets"]`; the Panel filters and authorizes these offers.
+
+| Method | Endpoint | Use |
+| --- | --- | --- |
+| GET | `/api/v1/preinstalls/` | List recipes, versions and configuration fields |
+| POST | `/api/v1/preinstalls/resolve` | Resolve `{ "preset": "discord-tickets", "version": "4.0" }` |
+| GET | `/api/v1/preinstalls/artifacts/{id}` | Download cached initial files with SHA-256 verification |
+
+Recipe requests use `REGISTRY_API_TOKEN` if set, falling back to `MINECRAFT_API_TOKEN`. Artifact downloads do not require the token. Limits are 120 recipe requests or 1,200 artifact requests per IP per minute. The Registry never receives Discord credentials or generated encryption keys.
+
+The supplied Discord Tickets recipe uses the official 4.0 image and SQLite. The upstream 4.0 tag is rolling; the Worker pins the downloaded digest when installing. Configure private Discord credentials and the dashboard URL in the Cell's Startup settings after installation. Refer to the upstream self-hosting documentation for OAuth2 and proxy configuration. Source recipes support Git checkout, directory/file operations, HTTPS downloads, tar.gz extraction and command steps inside a staging container. Discord Tickets has a second `discord-tickets-source` preset. Automatic external database provisioning is not included. Combs can also embed complete recipes in `preinstall_recipes`; the Panel sends these administrator-authored recipes to the resolve endpoint for validation and initial-file caching. Build variables marked `install: true` and `secret: false` may be customized during preview.

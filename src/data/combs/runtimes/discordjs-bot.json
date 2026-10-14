@@ -1,0 +1,188 @@
+{
+    "id": "discordjs-bot",
+    "name": "Discord.js Bot Hosting",
+    "category": "bot",
+    "group": "discord",
+    "tags": [
+        "discord",
+        "discord.js",
+        "nodejs",
+        "bot"
+    ],
+    "capabilities": [
+        "console",
+        "files",
+        "logs",
+        "environment",
+        "allocations",
+        "sftp",
+        "backups",
+        "schedules"
+    ],
+    "image": "node:22-bookworm",
+    "working_dir": "/home/container",
+    "entrypoint": [],
+    "environment": {
+        "TZ": "UTC",
+        "NODE_ENV": "production",
+        "DISCORD_TOKEN": "{{DISCORD_TOKEN}}"
+    },
+    "mounts": [
+        {
+            "source": "instance",
+            "target": "/home/container"
+        }
+    ],
+    "startup": "{{startup_command}}",
+    "variables_schema": [
+        {
+            "name": "startup_command",
+            "type": "string",
+            "default": "node index.js",
+            "required": true,
+            "description": "Command to start your uploaded bot, for example node index.js or npm start. The Discord Tickets preinstall configures its own startup command."
+        },
+        {
+            "name": "DISCORD_TOKEN",
+            "type": "string",
+            "default": "",
+            "required": false,
+            "secret": true,
+            "description": "Private bot token. Available as process.env.DISCORD_TOKEN; some bots use their own configuration instead."
+        }
+    ],
+    "install": [],
+    "game": "discord",
+    "stop": {
+        "command": "",
+        "timeout": 30,
+        "signal": "SIGTERM"
+    },
+    "preinstall_recipes": [
+        {
+            "id": "discord-tickets-source",
+            "name": "Discord Tickets (from source)",
+            "description": "Self-hosted ticket management bot with a web dashboard.",
+            "source": "https://github.com/discord-tickets/bot",
+            "license": "GPL-3.0-or-later",
+            "warnings": [
+                "This replaces the files in your Cell. Previous files are retained in its installation backup.",
+                "Uses SQLite for a single-Cell setup. The project recommends an external database for production.",
+                "Set your Discord credentials, owner ID and dashboard URL on Startup before starting.",
+                "Clones upstream tag v4.0.52 and installs dependencies inside the Cell staging container."
+            ],
+            "versions": [
+                {
+                    "id": "4.0.52",
+                    "image": "node:22-bookworm"
+                }
+            ],
+            "runtime": {
+                "startup": "node scripts/postinstall.js && node .",
+                "environment": {
+                    "NODE_ENV": "production",
+                    "DB_PROVIDER": "sqlite",
+                    "DB_CONNECTION_URL": "file:/home/container/user/database.db",
+                    "HTTP_HOST": "0.0.0.0",
+                    "HTTP_PORT": "{{server_port}}",
+                    "HTTP_EXTERNAL": "{{HTTP_EXTERNAL}}",
+                    "DISCORD_TOKEN": "{{DISCORD_TOKEN}}",
+                    "DISCORD_SECRET": "{{DISCORD_SECRET}}",
+                    "SUPER": "{{SUPER}}",
+                    "HTTP_TRUST_PROXY": "{{HTTP_TRUST_PROXY}}",
+                    "PUBLISH_COMMANDS": "true"
+                },
+                "variables_schema": [
+                    {
+                        "name": "DISCORD_TOKEN",
+                        "type": "string",
+                        "default": "",
+                        "required": true,
+                        "secret": true,
+                        "description": "Bot token from the Discord Developer Portal."
+                    },
+                    {
+                        "name": "DISCORD_SECRET",
+                        "type": "string",
+                        "default": "",
+                        "required": true,
+                        "secret": true,
+                        "description": "OAuth2 client secret from the Discord Developer Portal."
+                    },
+                    {
+                        "name": "HTTP_EXTERNAL",
+                        "type": "string",
+                        "default": "",
+                        "required": true,
+                        "description": "Public dashboard URL, including https://. Configure your reverse proxy and Discord OAuth2 redirect URI to match."
+                    },
+                    {
+                        "name": "SUPER",
+                        "type": "string",
+                        "default": "",
+                        "required": true,
+                        "description": "Your Discord user ID. Comma-separated IDs are supported."
+                    },
+                    {
+                        "name": "HTTP_TRUST_PROXY",
+                        "type": "boolean",
+                        "default": "false",
+                        "description": "Enable only behind a trusted reverse proxy."
+                    },
+                    {
+                        "name": "SOURCE_REF",
+                        "type": "string",
+                        "default": "v4.0.52",
+                        "required": true,
+                        "secret": false,
+                        "install": true,
+                        "description": "Git tag or commit to install. The default is the verified 4.0.52 release."
+                    }
+                ],
+                "secretKeys": [
+                    "ENCRYPTION_KEY"
+                ]
+            },
+            "files": {
+                "PREINSTALL.md": "# Discord Tickets source installation\n\nApplication files and installed dependencies are in this Cell. Private settings are configured through Startup. Persistent data is in user/.\n\nSource: https://github.com/discord-tickets/bot (GPL-3.0-or-later)\n",
+                "user/.keep": ""
+            },
+            "steps": [
+                {
+                    "type": "git",
+                    "with": {
+                        "repository": "https://github.com/discord-tickets/bot.git",
+                        "ref": "{{SOURCE_REF}}",
+                        "target": "source"
+                    }
+                },
+                {
+                    "type": "copy",
+                    "with": {
+                        "source": "source",
+                        "target": "."
+                    }
+                },
+                {
+                    "type": "delete",
+                    "with": {
+                        "path": ".git"
+                    }
+                },
+                {
+                    "type": "delete",
+                    "with": {
+                        "path": "source"
+                    }
+                },
+                {
+                    "type": "run",
+                    "with": {
+                        "directory": ".",
+                        "command": "CI=true npx --yes bun@1 install --production --frozen-lockfile"
+                    }
+                }
+            ]
+        }
+    ]
+}

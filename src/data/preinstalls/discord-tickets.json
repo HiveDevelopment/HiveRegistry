@@ -1,0 +1,82 @@
+{
+    "id": "discord-tickets",
+    "name": "Discord Tickets",
+    "description": "Self-hosted ticket management bot with a web dashboard.",
+    "source": "https://github.com/discord-tickets/bot",
+    "license": "GPL-3.0-or-later",
+    "warnings": [
+        "This replaces the files in your Cell. Previous files are retained in its installation backup.",
+        "Uses SQLite for a single-Cell setup. The project recommends an external database for production.",
+        "The 4.0 image is an upstream maintained tag; reinstalling can fetch a newer 4.0 release.",
+        "Set your Discord credentials, owner ID and dashboard URL on Startup before starting."
+    ],
+    "versions": [
+        {
+            "id": "4.0",
+            "image": "ghcr.io/discord-tickets/bot:4.0"
+        }
+    ],
+    "runtime": {
+        "startup": "/app/scripts/start.sh",
+        "environment": {
+            "DOCKER": "true",
+            "PTERODACTYL": "false",
+            "NODE_ENV": "production",
+            "DB_PROVIDER": "sqlite",
+            "DB_CONNECTION_URL": "file:/home/container/user/database.db",
+            "HTTP_HOST": "0.0.0.0",
+            "HTTP_PORT": "{{server_port}}",
+            "HTTP_EXTERNAL": "{{HTTP_EXTERNAL}}",
+            "DISCORD_TOKEN": "{{DISCORD_TOKEN}}",
+            "DISCORD_SECRET": "{{DISCORD_SECRET}}",
+            "SUPER": "{{SUPER}}",
+            "HTTP_TRUST_PROXY": "{{HTTP_TRUST_PROXY}}",
+            "PUBLISH_COMMANDS": "true"
+        },
+        "variables_schema": [
+            {
+                "name": "DISCORD_TOKEN",
+                "type": "string",
+                "default": "",
+                "required": true,
+                "secret": true,
+                "description": "Bot token from the Discord Developer Portal."
+            },
+            {
+                "name": "DISCORD_SECRET",
+                "type": "string",
+                "default": "",
+                "required": true,
+                "secret": true,
+                "description": "OAuth2 client secret from the Discord Developer Portal."
+            },
+            {
+                "name": "HTTP_EXTERNAL",
+                "type": "string",
+                "default": "",
+                "required": true,
+                "description": "Public dashboard URL, including https://. Configure your reverse proxy and Discord OAuth2 redirect URI to match."
+            },
+            {
+                "name": "SUPER",
+                "type": "string",
+                "default": "",
+                "required": true,
+                "description": "Your Discord user ID. Comma-separated IDs are supported."
+            },
+            {
+                "name": "HTTP_TRUST_PROXY",
+                "type": "boolean",
+                "default": "false",
+                "description": "Enable only behind a trusted reverse proxy."
+            }
+        ],
+        "secretKeys": [
+            "ENCRYPTION_KEY"
+        ]
+    },
+    "files": {
+        "PREINSTALL.md": "# Discord Tickets\n\nApplication code and dependencies are provided by the official container image. Your Cell stores configuration and persistent data in user/.\n\nConfigure private credentials, owner ID and dashboard URL on the Startup page before starting. SQLite is intended for a simple setup; consider an external database for production.\n\nDocumentation: https://discordtickets.app/self-hosting/\nSource and license: https://github.com/discord-tickets/bot (GPL-3.0-or-later)\n",
+        "user/.keep": ""
+    }
+}

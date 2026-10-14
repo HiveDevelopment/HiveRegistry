@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { presetSchema } from "../preinstalls/catalogue.js";
 
 export const VariableSchemaZod = z.object({
   name: z.string(),
@@ -107,6 +108,7 @@ export const CombSchema = z.object({
   tags: z.array(z.string()).default([]),
   capabilities: z.array(CombCapabilityZod).default([]),
   image: z.string().min(1),
+  docker_images: z.record(z.string(), z.string().min(1)).optional(),
   working_dir: z.string().min(1),
   entrypoint: z.array(z.string()),
   environment: z.record(z.string(), z.string()),
@@ -118,5 +120,10 @@ export const CombSchema = z.object({
   ),
   startup: z.string(),
   variables_schema: z.array(VariableSchemaZod),
+  preinstall_recipes: z.array(presetSchema).max(50).optional(),
+  preinstalls: z
+    .array(z.string().regex(/^[a-z0-9-]{1,80}$/))
+    .max(50)
+    .optional(),
   install: z.array(CombInstallOperationZod),
 });

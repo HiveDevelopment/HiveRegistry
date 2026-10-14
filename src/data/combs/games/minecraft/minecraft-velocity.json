@@ -20,6 +20,11 @@
     "schedules"
   ],
   "image": "ghcr.io/hivedevelopment/hivepanel-java:25",
+  "docker_images": {
+    "Java 25": "ghcr.io/hivedevelopment/hivepanel-java:25",
+    "Java 21": "ghcr.io/hivedevelopment/hivepanel-java:21",
+    "Java 8": "ghcr.io/hivedevelopment/hivepanel-java:8"
+  },
   "working_dir": "/home/container",
   "entrypoint": [],
   "environment": {

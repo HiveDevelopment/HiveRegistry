@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { config } from "../config.js";
 import {
+  compatiblePlatforms,
   release,
   versions,
   type Selection,
@@ -132,7 +133,9 @@ export async function resolve(input: PlanRequest) {
     }
     if (
       !item.gameVersions.includes(minecraft) ||
-      !item.loaders.includes(loader)
+      !(input.kind === "plugin" ? compatiblePlatforms(loader) : [loader]).some(
+        (platform) => item.loaders.includes(platform),
+      )
     )
       throw new Error(
         `${item.name} is incompatible with ${minecraft} / ${loader}`,

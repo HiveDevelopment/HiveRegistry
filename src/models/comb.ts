@@ -55,11 +55,14 @@ export interface Comb {
   tags: string[];
   capabilities: CombCapability[];
   image: string;
+  docker_images?: Record<string, string>;
   working_dir: string;
   entrypoint: string[];
   environment: Record<string, string>;
   mounts: CombMount[];
   startup: string;
   variables_schema: VariableSchema[];
+  preinstalls?: string[];
+  preinstall_recipes?: Record<string, unknown>[];
   install: CombInstallOperation[];
 }

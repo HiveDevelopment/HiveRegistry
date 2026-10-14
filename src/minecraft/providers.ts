@@ -25,6 +25,15 @@ export type Release = {
   client: string;
   kind: string;
 };
+export function compatiblePlatforms(loader: string) {
+  return loader === "paper"
+    ? ["paper", "spigot", "bukkit"]
+    : loader === "purpur"
+      ? ["purpur", "paper", "spigot", "bukkit"]
+      : loader === "spigot"
+        ? ["spigot", "bukkit"]
+        : [loader];
+}
 const cfLoaders: Record<string, number> = {
   forge: 1,
   fabric: 4,
@@ -63,7 +72,12 @@ export async function search(
   if (provider === "modrinth") {
     const facets = [[`project_type:${kind === "plugin" ? "mod" : kind}`]];
     if (minecraft) facets.push([`versions:${minecraft}`]);
-    if (loader) facets.push([`categories:${loader}`]);
+    if (loader)
+      facets.push(
+        (kind === "plugin" ? compatiblePlatforms(loader) : [loader]).map(
+          (value) => `categories:${value}`,
+        ),
+      );
     const data = await modrinth(
       "search?" +
         new URLSearchParams({
@@ -125,7 +139,8 @@ export async function versions(
   if (provider === "modrinth") {
     const params = new URLSearchParams();
     if (minecraft) params.set("game_versions", JSON.stringify([minecraft]));
-    if (loader) params.set("loaders", JSON.stringify([loader]));
+    if (loader)
+      params.set("loaders", JSON.stringify(compatiblePlatforms(loader)));
     const all = await modrinth(`project/${id(project)}/version?${params}`);
     return {
       total: all.length,

@@ -13,29 +13,65 @@
     "logs",
     "domains",
     "ssl",
-    "backups"
+    "backups",
+    "console",
+    "environment"
   ],
-  "image": "nginx:alpine",
-  "working_dir": "/usr/share/nginx/html",
+  "image": "nginx:stable-alpine",
+  "working_dir": "/home/container",
   "entrypoint": [],
   "environment": {
-    "TZ": "UTC"
+    "TZ": "UTC",
+    "PORT": "{{allocation.port}}",
+    "HOST": "0.0.0.0",
+    "HOME": "/home/container",
+    "DOCUMENT_ROOT": "{{document_root}}"
   },
   "mounts": [
     {
       "source": "instance",
-      "target": "/usr/share/nginx/html"
+      "target": "/home/container"
     }
   ],
-  "startup": "nginx -g 'daemon off;'",
-  "variables_schema": [],
+  "startup": "sh web-start.sh",
+  "variables_schema": [
+    {
+      "name": "document_root",
+      "type": "string",
+      "default": "public",
+      "required": true,
+      "description": "Relative folder in this Cell served by Nginx (public for Laravel; your WordPress folder for WordPress).",
+      "user_editable": true
+    }
+  ],
   "install": [
     {
       "type": "write_file",
       "with": {
-        "target": "index.html",
-        "content": "<!doctype html><html><body><h1>HivePanel</h1><p>Your website is ready.</p></body></html>"
+        "target": "public/index.html",
+        "content": "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>Your website</title><h1>Your website is ready</h1><p>Upload your files, then connect your domain in HivePanel.</p></html>"
+      }
+    },
+    {
+      "type": "write_file",
+      "with": {
+        "target": "web-start.sh",
+        "content": "#!/bin/sh\nset -eu\nPORT=${PORT:-8080}\nDOC_ROOT=${DOCUMENT_ROOT:-public}\ncase \"$PORT\" in ''|*[!0-9]*) echo \"PORT must be a number\" >&2; exit 1;; esac\nif [ \"$PORT\" -lt 1024 ] || [ \"$PORT\" -gt 65535 ]; then echo \"Use a Cell allocation between 1024 and 65535\" >&2; exit 1; fi\ncase \"$DOC_ROOT\" in ''|/*|*..*|*[!a-zA-Z0-9_./-]*) echo \"Document root must be a safe relative folder in your Cell\" >&2; exit 1;; esac\nSITE_ROOT=/home/container/$DOC_ROOT\n[ -d \"$SITE_ROOT\" ] || { echo \"Create your document root folder: $DOC_ROOT\" >&2; exit 1; }\nmkdir -p /tmp/hive-web\ncat > /tmp/hive-web/nginx.conf <<EOF\nworker_processes auto;\npid /tmp/hive-web/nginx.pid;\nerror_log /dev/stderr;\nevents { worker_connections 1024; }\nhttp {\n include /etc/nginx/mime.types;\n default_type application/octet-stream;\n access_log /dev/stdout;\n server_tokens off;\n client_body_temp_path /tmp/hive-web/body;\n proxy_temp_path /tmp/hive-web/proxy;\n fastcgi_temp_path /tmp/hive-web/fastcgi;\n client_max_body_size 128m;\n server {\n  listen $PORT;\n  server_name _;\n  root $SITE_ROOT;\n  index index.html;\n  location / { try_files \\$uri \\$uri/ =404; }\n  location ~ /\\. { deny all; }\n }\n}\nEOF\nexec nginx -c /tmp/hive-web/nginx.conf -g 'daemon off;'\n"
       }
     }
-  ]
+  ],
+  "shell": "sh",
+  "stop": {
+    "command": "",
+    "timeout": 30,
+    "signal": "SIGTERM"
+  },
+  "variables": {
+    "document_root": "public"
+  },
+  "recommended_resources": {
+    "memory_mb": 128,
+    "disk_mb": 1024,
+    "cpu_percent": 25
+  }
 }

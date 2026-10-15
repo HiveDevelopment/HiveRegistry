@@ -17,11 +17,15 @@
     "ssl",
     "backups"
   ],
-  "image": "php:8.4-fpm-alpine",
+  "image": "hivepanel/web-php:8.4",
   "working_dir": "/home/container",
   "entrypoint": [],
   "environment": {
-    "TZ": "UTC"
+    "TZ": "UTC",
+    "PORT": "{{allocation.port}}",
+    "HOST": "0.0.0.0",
+    "HOME": "/home/container",
+    "DOCUMENT_ROOT": "{{document_root}}"
   },
   "mounts": [
     {
@@ -29,22 +33,43 @@
       "target": "/home/container"
     }
   ],
-  "startup": "php -S 0.0.0.0:{{allocation.port}} -t {{document_root}}",
+  "startup": "/usr/local/bin/hive-web",
   "variables_schema": [
     {
       "name": "document_root",
       "type": "string",
-      "default": ".",
-      "required": true
+      "default": "public",
+      "required": true,
+      "description": "Relative folder in this Cell served by Nginx (public for Laravel; your WordPress folder for WordPress).",
+      "user_editable": true
     }
   ],
   "install": [
     {
       "type": "write_file",
       "with": {
-        "target": "index.php",
+        "target": "public/index.php",
         "content": "<?php echo '<h1>HivePanel</h1><p>Your PHP website is ready.</p>';"
       }
     }
-  ]
+  ],
+  "shell": "sh",
+  "stop": {
+    "command": "",
+    "timeout": 30,
+    "signal": "SIGTERM"
+  },
+  "variables": {
+    "document_root": "public"
+  },
+  "docker_images": {
+    "PHP 8.4 \u00b7 Nginx": "hivepanel/web-php:8.4",
+    "PHP 8.3 \u00b7 Nginx": "hivepanel/web-php:8.3",
+    "PHP 8.2 \u00b7 Nginx": "hivepanel/web-php:8.2"
+  },
+  "recommended_resources": {
+    "memory_mb": 512,
+    "disk_mb": 2048,
+    "cpu_percent": 100
+  }
 }

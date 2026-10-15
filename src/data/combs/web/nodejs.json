@@ -22,7 +22,10 @@
   "entrypoint": [],
   "environment": {
     "TZ": "UTC",
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "PORT": "{{allocation.port}}",
+    "HOST": "0.0.0.0",
+    "HOME": "/home/container"
   },
   "mounts": [
     {
@@ -40,5 +43,38 @@
       "description": "Command used to start the application."
     }
   ],
-  "install": []
+  "install": [
+    {
+      "type": "write_file",
+      "with": {
+        "target": "package.json",
+        "content": "{\n  \"name\": \"hive-website\",\n  \"private\": true,\n  \"scripts\": {\n    \"start\": \"node index.js\"\n  }\n}"
+      }
+    },
+    {
+      "type": "write_file",
+      "with": {
+        "target": "index.js",
+        "content": "const http = require('node:http');\nconst port = Number(process.env.PORT || 8080);\nhttp.createServer((req, res) => { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end('<h1>Your Node.js website is ready</h1><p>Replace this app and connect your domain in HivePanel.</p>'); }).listen(port, '0.0.0.0', () => console.log(`Website listening on port ${port}`));\n"
+      }
+    }
+  ],
+  "shell": "sh",
+  "stop": {
+    "command": "",
+    "timeout": 30,
+    "signal": "SIGTERM"
+  },
+  "docker_images": {
+    "Node.js 22": "node:22-alpine",
+    "Node.js 24": "node:24-alpine"
+  },
+  "variables": {
+    "startup_command": "npm start"
+  },
+  "recommended_resources": {
+    "memory_mb": 512,
+    "disk_mb": 2048,
+    "cpu_percent": 100
+  }
 }

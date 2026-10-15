@@ -45,5 +45,10 @@
     "preinstalls": [
         "discord-tickets",
         "discord-tickets-source"
-    ]
+    ],
+    "recommended_resources": {
+        "memory_mb": 256,
+        "disk_mb": 1024,
+        "cpu_percent": 50
+    }
 }

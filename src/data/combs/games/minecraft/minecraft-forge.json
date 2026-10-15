@@ -86,5 +86,10 @@
         "content": "server-port={{allocation.port}}\nonline-mode=true\nmotd=HivePanel Forge Server\n"
       }
     }
-  ]
+  ],
+  "recommended_resources": {
+    "memory_mb": 4096,
+    "disk_mb": 20480,
+    "cpu_percent": 200
+  }
 }

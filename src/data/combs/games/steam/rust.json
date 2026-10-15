@@ -118,5 +118,10 @@
                 "mode": "0755"
             }
         }
-    ]
+    ],
+    "recommended_resources": {
+        "memory_mb": 8192,
+        "disk_mb": 20480,
+        "cpu_percent": 200
+    }
 }

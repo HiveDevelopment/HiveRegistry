@@ -87,5 +87,10 @@
         "content": "server-port={{allocation.port}}\nonline-mode=true\nmotd=HivePanel Server\n"
       }
     }
-  ]
+  ],
+  "recommended_resources": {
+    "memory_mb": 2048,
+    "disk_mb": 10240,
+    "cpu_percent": 100
+  }
 }

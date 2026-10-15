@@ -58,5 +58,10 @@
       "required": true
     }
   ],
-  "install": []
+  "install": [],
+  "recommended_resources": {
+    "memory_mb": 512,
+    "disk_mb": 5120,
+    "cpu_percent": 100
+  }
 }

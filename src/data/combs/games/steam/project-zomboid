@@ -124,5 +124,10 @@
     "command": "quit",
     "timeout": 30,
     "signal": "SIGTERM"
+  },
+  "recommended_resources": {
+    "memory_mb": 4096,
+    "disk_mb": 10240,
+    "cpu_percent": 100
   }
 }

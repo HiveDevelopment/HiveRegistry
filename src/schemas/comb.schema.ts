@@ -109,7 +109,18 @@ export const CombSchema = z.object({
   capabilities: z.array(CombCapabilityZod).default([]),
   image: z.string().min(1),
   docker_images: z.record(z.string(), z.string().min(1)).optional(),
+  recommended_resources: z.object({
+    memory_mb: z.number().int().nonnegative().optional(),
+    overhead_memory_mb: z.number().int().nonnegative().optional(),
+    swap_mb: z.number().int().min(-1).optional(),
+    disk_mb: z.number().int().nonnegative().optional(),
+    cpu_percent: z.number().int().min(0).max(1000).optional(),
+    io_weight: z.number().int().min(10).max(1000).optional(),
+  }).strict().optional(),
   working_dir: z.string().min(1),
+  shell: z.enum(["sh", "bash"]).optional(),
+  variables: z.record(z.string(), z.string()).optional(),
+  stop: z.object({command:z.string().max(1000).refine(value=>!/[\r\n]/.test(value)),timeout:z.number().int().min(0).max(600),signal:z.enum(["SIGTERM","SIGINT","SIGHUP","SIGQUIT"])}).optional(),
   entrypoint: z.array(z.string()),
   environment: z.record(z.string(), z.string()),
   mounts: z.array(

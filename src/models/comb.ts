@@ -56,7 +56,11 @@ export interface Comb {
   capabilities: CombCapability[];
   image: string;
   docker_images?: Record<string, string>;
+  recommended_resources?: { memory_mb?: number; overhead_memory_mb?: number; swap_mb?: number; disk_mb?: number; cpu_percent?: number; io_weight?: number };
   working_dir: string;
+  shell?: "sh" | "bash";
+  variables?: Record<string,string>;
+  stop?: {command:string;timeout:number;signal:"SIGTERM"|"SIGINT"|"SIGHUP"|"SIGQUIT"};
   entrypoint: string[];
   environment: Record<string, string>;
   mounts: CombMount[];

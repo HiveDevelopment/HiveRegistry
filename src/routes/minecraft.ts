@@ -18,11 +18,13 @@ export async function minecraftRoutes(app: FastifyInstance) {
   app.addHook("preHandler", async (request, reply) => {
     const artifactRequest =
       request.routeOptions.url?.endsWith("/artifacts/:id");
+    const token =
+      process.env.REGISTRY_API_TOKEN?.trim() ||
+      process.env.MINECRAFT_API_TOKEN?.trim();
     if (
+      process.env.REGISTRY_REQUIRE_AUTH === "true" &&
       !artifactRequest &&
-      process.env.MINECRAFT_API_TOKEN &&
-      request.headers.authorization !==
-        `Bearer ${process.env.MINECRAFT_API_TOKEN}`
+      (!token || request.headers.authorization !== `Bearer ${token}`)
     )
       return reply
         .code(401)
@@ -44,12 +46,9 @@ export async function minecraftRoutes(app: FastifyInstance) {
       { message: error instanceof Error ? error.message : "Provider failed" },
       "Minecraft catalogue request failed",
     );
-    reply
-      .code(422)
-      .send({
-        message:
-          error instanceof Error ? error.message : "Catalogue unavailable",
-      });
+    reply.code(422).send({
+      message: error instanceof Error ? error.message : "Catalogue unavailable",
+    });
   });
   app.get("/versions", async () => ({
     versions: await minecraftVersions(),

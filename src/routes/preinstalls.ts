@@ -19,11 +19,12 @@ export async function preinstallRoutes(app: FastifyInstance) {
         .code(429)
         .send({ message: "Registry request limit reached" });
     const token =
-      process.env.REGISTRY_API_TOKEN ?? process.env.MINECRAFT_API_TOKEN;
+      process.env.REGISTRY_API_TOKEN?.trim() ||
+      process.env.MINECRAFT_API_TOKEN?.trim();
     if (
+      process.env.REGISTRY_REQUIRE_AUTH === "true" &&
       !request.routeOptions.url?.endsWith("/artifacts/:id") &&
-      token &&
-      request.headers.authorization !== `Bearer ${token}`
+      (!token || request.headers.authorization !== `Bearer ${token}`)
     )
       return reply
         .code(401)
@@ -31,11 +32,9 @@ export async function preinstallRoutes(app: FastifyInstance) {
   });
   app.setErrorHandler((error, request, reply) => {
     request.log.warn({ err: error }, "Preinstall request failed");
-    reply
-      .code(422)
-      .send({
-        message: "This preinstall is unavailable or its recipe is invalid.",
-      });
+    reply.code(422).send({
+      message: "This preinstall is unavailable or its recipe is invalid.",
+    });
   });
   app.get("/", async () => ({
     presets: (await presets()).map(({ files, runtime, steps, ...preset }) => ({

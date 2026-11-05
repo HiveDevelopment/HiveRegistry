@@ -62,17 +62,17 @@ MINECRAFT_CACHE_DIR=/var/lib/hiveregistry/minecraft-cache
 | --- | --- |
 | `APP_URL` | Public HTTPS Registry URL used to generate artifact download URLs. Must be reachable by Workers. |
 | `HOST`, `PORT` | Server bind address and port. |
-| `MINECRAFT_API_TOKEN` | Optional shared Bearer token for Minecraft API operations. If empty, those operations are public. |
+| `MINECRAFT_API_TOKEN` | Optional shared Bearer token for Minecraft API operations. Used only when REGISTRY_REQUIRE_AUTH=true. |
 | `CURSEFORGE_API_KEY` | Required to enable CurseForge searches, release lookup and resolution. |
 | `MODRINTH_TOKEN` | Optional Modrinth authentication token. Public Modrinth discovery works without it. |
 | `PROVIDER_USER_AGENT` | Identifies your Registry to upstream providers. |
 | `MINECRAFT_CACHE_DIR` | Metadata and artifact cache directory; defaults to `data/minecraft-cache`. |
 
-For a private deployment, configure a strong `MINECRAFT_API_TOKEN`. This token protects the Minecraft API only. Root, Comb and existing JAR catalogue routes remain public; use reverse-proxy access controls if those must also be private.
+The Registry is public by default, including when a token is configured. For a private deployment, set `REGISTRY_REQUIRE_AUTH=true` and configure a strong `REGISTRY_API_TOKEN` (or legacy `MINECRAFT_API_TOKEN`). Private mode fails closed if neither token is set. Private mode protects Minecraft and preinstall operations. Root, Comb and existing JAR catalogue routes remain public; use reverse-proxy access controls if those must also be private.
 
 ## Authentication
 
-When `MINECRAFT_API_TOKEN` is set, Minecraft requests require:
+When `REGISTRY_REQUIRE_AUTH=true`, Minecraft and preinstall requests require:
 
 ```http
 Authorization: Bearer YOUR_REGISTRY_TOKEN
@@ -428,6 +428,6 @@ Administrator-maintained JSON recipes under `src/data/preinstalls/` (or `PREINST
 | POST | `/api/v1/preinstalls/resolve` | Resolve `{ "preset": "discord-tickets", "version": "4.0" }` |
 | GET | `/api/v1/preinstalls/artifacts/{id}` | Download cached initial files with SHA-256 verification |
 
-Recipe requests use `REGISTRY_API_TOKEN` if set, falling back to `MINECRAFT_API_TOKEN`. Artifact downloads do not require the token. Limits are 120 recipe requests or 1,200 artifact requests per IP per minute. The Registry never receives Discord credentials or generated encryption keys.
+Recipe requests are public by default; with `REGISTRY_REQUIRE_AUTH=true`, they use `REGISTRY_API_TOKEN` if set, falling back to `MINECRAFT_API_TOKEN`. Artifact downloads do not require the token. Limits are 120 recipe requests or 1,200 artifact requests per IP per minute. The Registry never receives Discord credentials or generated encryption keys.
 
 The supplied Discord Tickets recipe uses the official 4.0 image and SQLite. The upstream 4.0 tag is rolling; the Worker pins the downloaded digest when installing. Configure private Discord credentials and the dashboard URL in the Cell's Startup settings after installation. Refer to the upstream self-hosting documentation for OAuth2 and proxy configuration. Source recipes support Git checkout, directory/file operations, HTTPS downloads, tar.gz extraction and command steps inside a staging container. Discord Tickets has a second `discord-tickets-source` preset. Automatic external database provisioning is not included. Combs can also embed complete recipes in `preinstall_recipes`; the Panel sends these administrator-authored recipes to the resolve endpoint for validation and initial-file caching. Build variables marked `install: true` and `secret: false` may be customized during preview.

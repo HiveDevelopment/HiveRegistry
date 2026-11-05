@@ -8,6 +8,7 @@ const temporary = await fs.mkdtemp(
   path.join(os.tmpdir(), "hive-registry-test-"),
 );
 process.env.MINECRAFT_CACHE_DIR = temporary;
+process.env.REGISTRY_REQUIRE_AUTH = "true";
 process.env.MINECRAFT_API_TOKEN = "fixture-private-token";
 const oldFetch = globalThis.fetch;
 let packBytes;

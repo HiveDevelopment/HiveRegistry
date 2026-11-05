@@ -17,6 +17,7 @@ const { CombSchema } = await import("../dist/schemas/comb.schema.js");
 after(async () => fs.rm(temporary, { recursive: true, force: true }));
 
 test("preinstall routes protect recipes but allow verified artifact downloads", async () => {
+  process.env.REGISTRY_REQUIRE_AUTH = "true";
   const app = Fastify();
   await app.register(preinstallRoutes, { prefix: "/api/v1/preinstalls" });
   assert.equal((await app.inject("/api/v1/preinstalls/")).statusCode, 401);

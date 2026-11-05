@@ -65,7 +65,7 @@
     {
       "type": "steamcmd",
       "with": {
-        "app_id": 380870,
+        "app_id": "380870",
         "login": "anonymous",
         "install_dir": "/home/container",
         "validate": true
